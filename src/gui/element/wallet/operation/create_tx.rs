@@ -26,7 +26,10 @@ use {
         Button, Column, Container, Element, Header, PickList, Row, Scrollable, TableRow, Text,
         TextInput,
     },
-    grin_gui_core::wallet::{InitTxArgs, Slate, StatusMessage, WalletInfo, WalletInterface},
+    grin_gui_core::wallet::{
+        ContractNewArgsAPI, ContractSetupArgsAPI, InitTxArgs, Slate, StatusMessage, WalletInfo,
+        WalletInterface,
+    },
     grin_gui_core::{
         node::{amount_from_hr_string, amount_to_hr_string},
         theme::{ButtonStyle, ColorPalette, ContainerStyle},
@@ -101,7 +104,8 @@ pub fn handle_message<'a>(
             let w = grin_gui.wallet_interface.clone();
 
             let amount = match amount_from_hr_string(&state.amount_value) {
-                Ok(0) | Err(_) => {
+                // Ok(0) |
+                Err(_) => {
                     state.amount_error = true;
                     return Ok(Command::none());
                 }
@@ -109,18 +113,42 @@ pub fn handle_message<'a>(
             };
 
             // Todo: Amount parsing + validation, just testing the flow for now
-            let args = InitTxArgs {
-                src_acct_name: None,
-                amount,
-                minimum_confirmations: 2,
-                max_outputs: 500,
-                num_change_outputs: 1,
-                selection_strategy_is_use_all: false,
-                late_lock: Some(false),
+            let mut num_participants = 2;
+            // TODO: this is horrible, fix it
+            let w2 = w.clone();
+            let w2w = w2.write().unwrap();
+            // Check if the recipient is us. If it is, the number of participants is 1.
+            // TODO: if it's a self-spend, just sign it after and broadcast the tx
+            if let Some(o) = &w2w.owner_api {
+                let res = o.get_slatepack_address(None, 0)?.to_string();
+                if res == state.recipient_address_value.clone() {
+                    num_participants = 1;
+                }
+            }
+            let args_ct = ContractNewArgsAPI {
+                setup_args: ContractSetupArgsAPI {
+                    net_change: Some(amount as i64),
+                    num_participants: num_participants,
+                    add_outputs: true,
+                    ..Default::default()
+                },
                 ..Default::default()
             };
-            let fut =
-                move || WalletInterface::create_tx(w, args, state.recipient_address_value.clone());
+            // let args = InitTxArgs {
+            //     src_acct_name: None,
+            //     amount,
+            //     minimum_confirmations: 2,
+            //     max_outputs: 500,
+            //     num_change_outputs: 1,
+            //     selection_strategy_is_use_all: false,
+            //     late_lock: Some(false),
+            //     ..Default::default()
+            // };
+            // let fut =
+            //     move || WalletInterface::create_tx(w, args, state.recipient_address_value.clone());
+            let fut = move || {
+                WalletInterface::create_contract(w, args_ct, state.recipient_address_value.clone())
+            };
 
             return Ok(Command::perform(fut(), |r| match r {
                 Ok(ret) => {

@@ -228,6 +228,8 @@
     "directory": "Directory",
     "wallet-create-tx": "Send",
     "wallet-apply-tx": "Receive",
+    "wallet-create-contract": "New",
+    "wallet-sign-contract": "Sign",
     "wallet-home": "Wallet - Set Name Here TBD",
     "apply-tx": "Apply Transaction",
     "create-tx": "Start Transaction",

@@ -25,7 +25,7 @@ use {
         Button, Column, Container, Element, Header, PickList, Row, Scrollable, TableRow, Text,
         TextInput,
     },
-    grin_gui_core::wallet::{StatusMessage, WalletInfo, WalletInterface},
+    grin_gui_core::wallet::{ContractSetupArgsAPI, StatusMessage, WalletInfo, WalletInterface},
     grin_gui_core::{node::amount_to_hr_string, theme::ColorPalette},
     iced::widget::{button, pick_list, scrollable, text_input, Checkbox, Space},
     iced::{alignment, Alignment, Command, Length},
@@ -97,54 +97,78 @@ pub fn handle_message<'a>(
 
             let w = grin_gui.wallet_interface.clone();
             let out_slate = slate.clone();
-            match slate.state {
-                SlateState::Standard1 => {
-                    let fut = move || {
-                        WalletInterface::receive_tx_from_s1(w, out_slate, sp_sending_address)
-                    };
+            let setup_args = ContractSetupArgsAPI {
+                // TODO: we should get the confirmation here
+                net_change: Some(slate.amount as i64),
+                // num_participants: num_participants,
+                // add_outputs: true,
+                ..Default::default()
+            };
+            let fut = move || {
+                WalletInterface::sign_contract(w, out_slate, setup_args, sp_sending_address)
+            };
+            return Ok(Command::perform(fut(), |r| {
+                match r.context("Failed to Progress Transaction") {
+                    Ok(ret) => Message::Interaction(
+                        Interaction::WalletOperationApplyTxConfirmViewInteraction(
+                            LocalViewInteraction::TxAcceptSuccess(ret),
+                        ),
+                    ),
+                    Err(e) => Message::Interaction(
+                        Interaction::WalletOperationApplyTxConfirmViewInteraction(
+                            LocalViewInteraction::TxAcceptFailure(Arc::new(RwLock::new(Some(e)))),
+                        ),
+                    ),
+                }
+            }));
+            // match slate.state {
+            //     SlateState::Standard1 => {
+            //         let fut = move || {
+            //             WalletInterface::receive_tx_from_s1(w, out_slate, sp_sending_address)
+            //         };
 
-                    return Ok(Command::perform(fut(), |r| {
-                        match r.context("Failed to Progress Transaction") {
-                            Ok(ret) => Message::Interaction(
-                                Interaction::WalletOperationApplyTxConfirmViewInteraction(
-                                    LocalViewInteraction::TxAcceptSuccess(ret),
-                                ),
-                            ),
-                            Err(e) => Message::Interaction(
-                                Interaction::WalletOperationApplyTxConfirmViewInteraction(
-                                    LocalViewInteraction::TxAcceptFailure(Arc::new(RwLock::new(
-                                        Some(e),
-                                    ))),
-                                ),
-                            ),
-                        }
-                    }));
-                }
-                SlateState::Standard2 => {
-                    let fut = move || WalletInterface::finalize_from_s2(w, out_slate, true);
+            //         return Ok(Command::perform(fut(), |r| {
+            //             match r.context("Failed to Progress Transaction") {
+            //                 Ok(ret) => Message::Interaction(
+            //                     Interaction::WalletOperationApplyTxConfirmViewInteraction(
+            //                         LocalViewInteraction::TxAcceptSuccess(ret),
+            //                     ),
+            //                 ),
+            //                 Err(e) => Message::Interaction(
+            //                     Interaction::WalletOperationApplyTxConfirmViewInteraction(
+            //                         LocalViewInteraction::TxAcceptFailure(Arc::new(RwLock::new(
+            //                             Some(e),
+            //                         ))),
+            //                     ),
+            //                 ),
+            //             }
+            //         }));
+            //     }
+            //     SlateState::Standard2 => {
+            //         let fut = move || WalletInterface::finalize_from_s2(w, out_slate, true);
 
-                    return Ok(Command::perform(fut(), |r| {
-                        match r.context("Failed to Progress Transaction") {
-                            Ok(ret) => Message::Interaction(
-                                Interaction::WalletOperationApplyTxConfirmViewInteraction(
-                                    LocalViewInteraction::TxAcceptSuccess(ret),
-                                ),
-                            ),
-                            Err(e) => Message::Interaction(
-                                Interaction::WalletOperationApplyTxConfirmViewInteraction(
-                                    LocalViewInteraction::TxAcceptFailure(Arc::new(RwLock::new(
-                                        Some(e),
-                                    ))),
-                                ),
-                            ),
-                        }
-                    }));
-                }
-                _ => {
-                    log::error!("Slate state not yet supported");
-                    return Ok(Command::none());
-                }
-            }
+            //         return Ok(Command::perform(fut(), |r| {
+            //             match r.context("Failed to Progress Transaction") {
+            //                 Ok(ret) => Message::Interaction(
+            //                     Interaction::WalletOperationApplyTxConfirmViewInteraction(
+            //                         LocalViewInteraction::TxAcceptSuccess(ret),
+            //                     ),
+            //                 ),
+            //                 Err(e) => Message::Interaction(
+            //                     Interaction::WalletOperationApplyTxConfirmViewInteraction(
+            //                         LocalViewInteraction::TxAcceptFailure(Arc::new(RwLock::new(
+            //                             Some(e),
+            //                         ))),
+            //                     ),
+            //                 ),
+            //             }
+            //         }));
+            //     }
+            //     _ => {
+            //         log::error!("Slate state not yet supported");
+            //         return Ok(Command::none());
+            //     }
+            // }
         }
         LocalViewInteraction::TxAcceptSuccess(slate) => {
             log::debug!("{:?}", slate);

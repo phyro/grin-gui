@@ -20,6 +20,8 @@ use dirs;
 // Re-exports
 pub use global::ChainTypes;
 pub use grin_wallet_impls::HTTPNodeClient;
+pub use grin_wallet_libwallet::contract::can_finalize;
+pub use grin_wallet_libwallet::contract::types::{ContractNewArgsAPI, ContractSetupArgsAPI};
 pub use grin_wallet_libwallet::{
     InitTxArgs, RetrieveTxQueryArgs, RetrieveTxQuerySortOrder, Slate, SlateState, Slatepack,
     SlatepackAddress, StatusMessage, TxLogEntry, TxLogEntryType, WalletInfo,
@@ -432,6 +434,55 @@ where
         if let Some(o) = &w.owner_api {
             let res = o.get_slatepack_address(None, 0)?;
             return Ok(res.to_string());
+        } else {
+            return Err(GrinWalletInterfaceError::OwnerAPINotInstantiated);
+        }
+    }
+
+    // contracts
+    pub async fn create_contract(
+        wallet_interface: Arc<RwLock<WalletInterface<L, C>>>,
+        init_args: ContractNewArgsAPI,
+        dest_slatepack_address: String,
+    ) -> Result<String, GrinWalletInterfaceError> {
+        let w = wallet_interface.write().unwrap();
+        let _address = match SlatepackAddress::try_from(dest_slatepack_address.as_str()) {
+            Ok(a) => Some(a),
+            Err(_) => return Err(GrinWalletInterfaceError::InvalidSlatepackAddress),
+        };
+        if let Some(o) = &w.owner_api {
+            // let slate = { o.init_send_tx(None, init_args)? };
+            let slate = { o.contract_new(None, &init_args)? };
+            // No need to lock outputs as they're already locked atomically
+            // o.tx_lock_outputs(None, &slate)?;
+            return WalletInterface::encrypt_slatepack(o, &dest_slatepack_address, &slate);
+        } else {
+            return Err(GrinWalletInterfaceError::OwnerAPINotInstantiated);
+        }
+    }
+    pub async fn sign_contract(
+        wallet_interface: Arc<RwLock<WalletInterface<L, C>>>,
+        slate: Slate,
+        setup_args: ContractSetupArgsAPI,
+        dest_slatepack_address: String,
+        // dest_slatepack_address: String,
+    ) -> Result<Option<String>, GrinWalletInterfaceError> {
+        let w = wallet_interface.write().unwrap();
+        if let Some(o) = &w.owner_api {
+            // let slate = { o.init_send_tx(None, init_args)? };
+            let slate = { o.contract_sign(None, &slate, &setup_args)? };
+            // No need to lock outputs as they're already locked atomically
+            // o.tx_lock_outputs(None, &slate)?;
+            let is_finalized = can_finalize(&slate);
+            if is_finalized {
+                o.post_tx(None, &slate, true)?;
+                return Ok(None);
+            } else {
+                let encrypted =
+                    WalletInterface::encrypt_slatepack(o, &dest_slatepack_address, &slate)?;
+                return Ok(Some(encrypted));
+            }
+            // return WalletInterface::encrypt_slatepack(o, &dest_slatepack_address, &slate);
         } else {
             return Err(GrinWalletInterfaceError::OwnerAPINotInstantiated);
         }

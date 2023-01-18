@@ -31,13 +31,23 @@ grin_keychain = { git = "https://github.com/mimblewimble/grin", branch = "master
 grin_chain = { git = "https://github.com/mimblewimble/grin", branch = "master" }
 
 ### Wallet
-grin_wallet = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
-grin_wallet_config = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
-grin_wallet_util = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
-grin_wallet_controller = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
-grin_wallet_api = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
-grin_wallet_impls = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
-grin_wallet_libwallet = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
+# grin_wallet = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
+# grin_wallet_config = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
+# grin_wallet_util = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
+# grin_wallet_controller = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
+# grin_wallet_api = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
+# grin_wallet_impls = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
+# grin_wallet_libwallet = { git = "https://github.com/mimblewimble/grin-wallet", branch = "master" }
+# grin-gui-widgets = { path = "../widgets" }
+
+### Wallet contracts
+grin_wallet = { git = "https://github.com/phyro/grin-wallet", branch = "simple_contracts_restructured_v3" }
+grin_wallet_config = { git = "https://github.com/phyro/grin-wallet", branch = "simple_contracts_restructured_v3" }
+grin_wallet_util = { git = "https://github.com/phyro/grin-wallet", branch = "simple_contracts_restructured_v3" }
+grin_wallet_controller = { git = "https://github.com/phyro/grin-wallet", branch = "simple_contracts_restructured_v3" }
+grin_wallet_api = { git = "https://github.com/phyro/grin-wallet", branch = "simple_contracts_restructured_v3" }
+grin_wallet_impls = { git = "https://github.com/phyro/grin-wallet", branch = "simple_contracts_restructured_v3" }
+grin_wallet_libwallet = { git = "https://github.com/phyro/grin-wallet", branch = "simple_contracts_restructured_v3" }
 grin-gui-widgets = { path = "../widgets" }
 
 
