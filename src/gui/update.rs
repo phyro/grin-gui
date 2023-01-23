@@ -132,8 +132,8 @@ pub fn handle_message(grin_gui: &mut GrinGui, message: Message) -> Result<Comman
         Message::Interaction(Interaction::ReadSlatepackFromClipboard) => {
             return Ok(clipboard::read::<Message>(|value| {
                 match value {
-                Some(v) => return Message::Interaction(Interaction::WalletOperationApplyTxViewInteraction(element::wallet::operation::apply_tx::LocalViewInteraction::ReadFromClipboardSuccess(v))),
-                None => return Message::Interaction(Interaction::WalletOperationApplyTxViewInteraction(element::wallet::operation::apply_tx::LocalViewInteraction::ReadFromClipboardFailure))
+                Some(v) => return Message::Interaction(Interaction::WalletOperationContractSignViewInteraction(element::wallet::operation::contract_sign::LocalViewInteraction::ReadFromClipboardSuccess(v))),
+                None => return Message::Interaction(Interaction::WalletOperationContractSignViewInteraction(element::wallet::operation::contract_sign::LocalViewInteraction::ReadFromClipboardFailure))
                 }
             }))
         } // Top level menu
@@ -201,6 +201,27 @@ pub fn handle_message(grin_gui: &mut GrinGui, message: Message) -> Result<Comman
         Message::Interaction(Interaction::WalletOperationCreateTxSuccessViewInteraction(l)) => {
             return element::wallet::operation::create_tx_success::handle_message(grin_gui, l);
         }
+        // Contracts
+        // Wallet -> Operation -> ContractNew
+        Message::Interaction(Interaction::WalletOperationContractNewViewInteraction(l)) => {
+            return element::wallet::operation::contract_new::handle_message(grin_gui, l);
+        }
+        // Wallet -> Operation -> ContractNewSuccess
+        Message::Interaction(Interaction::WalletOperationContractNewSuccessViewInteraction(l)) => {
+            return element::wallet::operation::contract_new_success::handle_message(grin_gui, l);
+        }
+        Message::Interaction(Interaction::WalletOperationContractSignViewInteraction(l)) => {
+            return element::wallet::operation::contract_sign::handle_message(grin_gui, l);
+        }
+        // Wallet -> Operation -> Home -> Action
+        Message::Interaction(Interaction::WalletOperationContractSignConfirmViewInteraction(l)) => {
+            return element::wallet::operation::contract_sign_confirm::handle_message(grin_gui, l);
+        }
+        // Wallet -> Operation -> Home -> Action
+        Message::Interaction(Interaction::WalletOperationContractSignSuccessViewInteraction(l)) => {
+            return element::wallet::operation::contract_sign_success::handle_message(grin_gui, l);
+        }
+        // Endcontracts
         // Wallet -> Operation -> Home -> Action
         Message::Interaction(Interaction::WalletOperationApplyTxViewInteraction(l)) => {
             return element::wallet::operation::apply_tx::handle_message(grin_gui, l);

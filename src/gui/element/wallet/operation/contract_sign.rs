@@ -61,7 +61,7 @@ pub enum Action {}
 pub enum LocalViewInteraction {
     Back,
     Address(String),
-    ApplyTransaction(String),
+    SignTransaction(String),
     ReadFromClipboardSuccess(String),
     ReadFromClipboardFailure,
 }
@@ -70,10 +70,10 @@ pub fn handle_message<'a>(
     grin_gui: &mut GrinGui,
     message: LocalViewInteraction,
 ) -> Result<Command<Message>> {
-    let state = &mut grin_gui.wallet_state.operation_state.apply_tx_state;
+    let state = &mut grin_gui.wallet_state.operation_state.contract_sign_state;
     match message {
         LocalViewInteraction::Back => {
-            log::debug!("Interaction::WalletOperationApplyTxViewInteraction(Back)");
+            log::debug!("Interaction::WalletOperationContractSignViewInteraction(Back)");
             grin_gui.wallet_state.operation_state.mode =
                 crate::gui::element::wallet::operation::Mode::Home;
         }
@@ -90,10 +90,10 @@ pub fn handle_message<'a>(
                     grin_gui
                         .wallet_state
                         .operation_state
-                        .apply_tx_confirm_state
+                        .contract_sign_confirm_state
                         .slatepack_parsed = Some(s);
                     grin_gui.wallet_state.operation_state.mode =
-                        crate::gui::element::wallet::operation::Mode::ApplyTxConfirm;
+                        crate::gui::element::wallet::operation::Mode::ContractSignConfirm;
                 }
             }
         }
@@ -101,7 +101,7 @@ pub fn handle_message<'a>(
             error!("Failed to read from clipboard");
         }
         LocalViewInteraction::Address(_) => {}
-        LocalViewInteraction::ApplyTransaction(_) => {}
+        LocalViewInteraction::SignTransaction(_) => {}
     }
     Ok(Command::none())
 }
@@ -110,7 +110,7 @@ pub fn data_container<'a>(config: &'a Config, state: &'a StateContainer) -> Cont
     let unit_spacing = 15;
 
     // Title row
-    let title = Text::new(localized_string("apply-tx"))
+    let title = Text::new(localized_string("sign-contract"))
         .size(DEFAULT_HEADER_FONT_SIZE)
         .horizontal_alignment(alignment::Horizontal::Center);
 
@@ -141,7 +141,7 @@ pub fn data_container<'a>(config: &'a Config, state: &'a StateContainer) -> Cont
         Container::new(address_name).style(grin_gui_core::theme::ContainerStyle::NormalBackground);
 
     let address_input = TextInput::new("", &state.address_value, |s| {
-        Interaction::WalletOperationApplyTxViewInteraction(LocalViewInteraction::Address(s))
+        Interaction::WalletOperationContractSignViewInteraction(LocalViewInteraction::Address(s))
     })
     .size(DEFAULT_FONT_SIZE)
     .padding(6)
@@ -223,7 +223,7 @@ pub fn data_container<'a>(config: &'a Config, state: &'a StateContainer) -> Cont
     let mut submit_button = Button::new(submit_button_label_container)
         .style(grin_gui_core::theme::ButtonStyle::Primary)
         .on_press(Interaction::ReadSlatepackFromClipboard);
-    /*let submit_button = submit_button.on_press(Interaction::WalletOperationApplyTxViewInteraction(
+    /*let submit_button = submit_button.on_press(Interaction::WalletOperationContractSignViewInteraction(
         LocalViewInteraction::ApplyTransaction("_".into()),
     ));*/
 
@@ -239,7 +239,7 @@ pub fn data_container<'a>(config: &'a Config, state: &'a StateContainer) -> Cont
 
     let cancel_button: Element<Interaction> = Button::new(cancel_button_label_container)
         .style(grin_gui_core::theme::ButtonStyle::Primary)
-        .on_press(Interaction::WalletOperationApplyTxViewInteraction(
+        .on_press(Interaction::WalletOperationContractSignViewInteraction(
             LocalViewInteraction::Back,
         ))
         .into();

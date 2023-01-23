@@ -420,6 +420,13 @@ pub enum Interaction {
     WalletOperationApplyTxViewInteraction(element::wallet::operation::apply_tx::LocalViewInteraction),
     WalletOperationApplyTxConfirmViewInteraction(element::wallet::operation::apply_tx_confirm::LocalViewInteraction),
     WalletOperationApplyTxSuccessViewInteraction(element::wallet::operation::apply_tx_success::LocalViewInteraction),
+    // contracts
+    WalletOperationContractNewViewInteraction(element::wallet::operation::contract_new::LocalViewInteraction),
+    WalletOperationContractNewSuccessViewInteraction(element::wallet::operation::contract_new_success::LocalViewInteraction),
+    WalletOperationContractSignViewInteraction(element::wallet::operation::contract_sign::LocalViewInteraction),
+    WalletOperationContractSignConfirmViewInteraction(element::wallet::operation::contract_sign_confirm::LocalViewInteraction),
+    WalletOperationContractSignSuccessViewInteraction(element::wallet::operation::contract_sign_success::LocalViewInteraction),
+    // end contracts
     ViewInteraction(String, String),
     ModeSelected(Mode),
     ModeSelectedSettings(element::settings::Mode),

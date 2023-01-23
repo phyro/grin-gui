@@ -183,8 +183,8 @@ pub fn handle_tick<'a>(
         }));
     }
     // If slatepack address is not filled out, go get it
-    let apply_tx_state = &mut grin_gui.wallet_state.operation_state.apply_tx_state;
-    if apply_tx_state.address_value.is_empty() {
+    let contract_sign_state = &mut grin_gui.wallet_state.operation_state.contract_sign_state;
+    if contract_sign_state.address_value.is_empty() {
         let w = grin_gui.wallet_interface.clone();
 
         let fut = move || WalletInterface::get_slatepack_address(w.clone());
@@ -272,7 +272,7 @@ pub fn handle_message<'a>(
             grin_gui
                 .wallet_state
                 .operation_state
-                .apply_tx_state
+                .contract_sign_state
                 .address_value = address;
         }
         LocalViewInteraction::TxDetails(tx_log_entry_wrap) => {
