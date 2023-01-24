@@ -382,8 +382,11 @@ where
     ) -> Result<(Slatepack, Slate), GrinWalletInterfaceError> {
         let w = wallet_interface.read().unwrap();
         if let Some(o) = &w.owner_api {
+            println!("decrypting slatepack: {}", slatepack);
             let sp = o.decode_slatepack_message(None, slatepack.clone(), vec![0])?;
+            println!("decoded");
             let slate = o.slate_from_slatepack_message(None, slatepack, vec![0])?;
+            println!("got slate");
             return Ok((sp, slate));
         } else {
             return Err(GrinWalletInterfaceError::OwnerAPINotInstantiated);
@@ -442,7 +445,7 @@ where
     // contracts
     pub async fn create_contract(
         wallet_interface: Arc<RwLock<WalletInterface<L, C>>>,
-        init_args: ContractNewArgsAPI,
+        new_args: ContractNewArgsAPI,
         dest_slatepack_address: String,
     ) -> Result<String, GrinWalletInterfaceError> {
         let w = wallet_interface.write().unwrap();
@@ -452,9 +455,11 @@ where
         };
         if let Some(o) = &w.owner_api {
             // let slate = { o.init_send_tx(None, init_args)? };
-            let slate = { o.contract_new(None, &init_args)? };
+            let slate = { o.contract_new(None, &new_args)? };
             // No need to lock outputs as they're already locked atomically
             // o.tx_lock_outputs(None, &slate)?;
+            println!("Encrypting slate for: {}", &dest_slatepack_address);
+            debug!("Encrypting slate: {}", &slate);
             return WalletInterface::encrypt_slatepack(o, &dest_slatepack_address, &slate);
         } else {
             return Err(GrinWalletInterfaceError::OwnerAPINotInstantiated);

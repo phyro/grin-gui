@@ -284,7 +284,6 @@ impl Application for GrinGui {
         //.on_esc(Message::Interaction(Interaction::CloseErrorModal))
         .style(grin_gui_core::theme::ModalStyle::Normal)
         .into()
-
     }
 }
 
@@ -415,11 +414,6 @@ pub enum Interaction {
     WalletOperationTxListInteraction(element::wallet::operation::tx_list::LocalViewInteraction),
     WalletOperationHomeTxListDisplayInteraction(element::wallet::operation::tx_list_display::LocalViewInteraction),
     WalletOperationHomeActionMenuViewInteraction(element::wallet::operation::action_menu::LocalViewInteraction),
-    WalletOperationCreateTxViewInteraction(element::wallet::operation::create_tx::LocalViewInteraction),
-    WalletOperationCreateTxSuccessViewInteraction(element::wallet::operation::create_tx_success::LocalViewInteraction),
-    WalletOperationApplyTxViewInteraction(element::wallet::operation::apply_tx::LocalViewInteraction),
-    WalletOperationApplyTxConfirmViewInteraction(element::wallet::operation::apply_tx_confirm::LocalViewInteraction),
-    WalletOperationApplyTxSuccessViewInteraction(element::wallet::operation::apply_tx_success::LocalViewInteraction),
     // contracts
     WalletOperationContractNewViewInteraction(element::wallet::operation::contract_new::LocalViewInteraction),
     WalletOperationContractNewSuccessViewInteraction(element::wallet::operation::contract_new_success::LocalViewInteraction),

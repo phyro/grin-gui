@@ -193,47 +193,25 @@ pub fn handle_message(grin_gui: &mut GrinGui, message: Message) -> Result<Comman
         Message::Interaction(Interaction::WalletOperationTxListInteraction(l)) => {
             return element::wallet::operation::tx_list::handle_message(grin_gui, l);
         }
-        // Wallet -> Operation -> CreateTx
-        Message::Interaction(Interaction::WalletOperationCreateTxViewInteraction(l)) => {
-            return element::wallet::operation::create_tx::handle_message(grin_gui, l);
-        }
-        // Wallet -> Operation -> CreateTxSuccess
-        Message::Interaction(Interaction::WalletOperationCreateTxSuccessViewInteraction(l)) => {
-            return element::wallet::operation::create_tx_success::handle_message(grin_gui, l);
-        }
         // Contracts
         // Wallet -> Operation -> ContractNew
         Message::Interaction(Interaction::WalletOperationContractNewViewInteraction(l)) => {
             return element::wallet::operation::contract_new::handle_message(grin_gui, l);
         }
-        // Wallet -> Operation -> ContractNewSuccess
         Message::Interaction(Interaction::WalletOperationContractNewSuccessViewInteraction(l)) => {
             return element::wallet::operation::contract_new_success::handle_message(grin_gui, l);
         }
         Message::Interaction(Interaction::WalletOperationContractSignViewInteraction(l)) => {
             return element::wallet::operation::contract_sign::handle_message(grin_gui, l);
         }
-        // Wallet -> Operation -> Home -> Action
         Message::Interaction(Interaction::WalletOperationContractSignConfirmViewInteraction(l)) => {
             return element::wallet::operation::contract_sign_confirm::handle_message(grin_gui, l);
         }
-        // Wallet -> Operation -> Home -> Action
         Message::Interaction(Interaction::WalletOperationContractSignSuccessViewInteraction(l)) => {
             return element::wallet::operation::contract_sign_success::handle_message(grin_gui, l);
         }
         // Endcontracts
-        // Wallet -> Operation -> Home -> Action
-        Message::Interaction(Interaction::WalletOperationApplyTxViewInteraction(l)) => {
-            return element::wallet::operation::apply_tx::handle_message(grin_gui, l);
-        }
-        // Wallet -> Operation -> Home -> Action
-        Message::Interaction(Interaction::WalletOperationApplyTxConfirmViewInteraction(l)) => {
-            return element::wallet::operation::apply_tx_confirm::handle_message(grin_gui, l);
-        }
-        // Wallet -> Operation -> Home -> Action
-        Message::Interaction(Interaction::WalletOperationApplyTxSuccessViewInteraction(l)) => {
-            return element::wallet::operation::apply_tx_success::handle_message(grin_gui, l);
-        }
+
         // Wallet -> Operation -> Home -> Action
         Message::Interaction(Interaction::WalletOperationHomeActionMenuViewInteraction(l)) => {
             return element::wallet::operation::action_menu::handle_message(grin_gui, l);

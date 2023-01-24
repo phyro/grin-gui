@@ -1,15 +1,10 @@
 pub mod action_menu;
-pub mod apply_tx;
-pub mod apply_tx_confirm;
-pub mod apply_tx_success;
 pub mod chart;
 pub mod contract_new;
 pub mod contract_new_success;
 pub mod contract_sign;
 pub mod contract_sign_confirm;
 pub mod contract_sign_success;
-pub mod create_tx;
-pub mod create_tx_success;
 pub mod home;
 pub mod open;
 pub mod tx_list;
@@ -30,11 +25,6 @@ pub struct StateContainer {
     pub mode: Mode,
     pub open_state: open::StateContainer,
     pub home_state: home::StateContainer,
-    pub create_tx_state: create_tx::StateContainer,
-    pub create_tx_success_state: create_tx_success::StateContainer,
-    pub apply_tx_state: apply_tx::StateContainer,
-    pub apply_tx_confirm_state: apply_tx_confirm::StateContainer,
-    pub apply_tx_success_state: apply_tx_success::StateContainer,
     // When changed to true, this should stay false until a wallet is opened with a password
     has_wallet_open_check_failed_one_time: bool,
     // contracts
@@ -49,11 +39,6 @@ pub struct StateContainer {
 pub enum Mode {
     Open,
     Home,
-    CreateTx,
-    CreateTxSuccess,
-    ApplyTx,
-    ApplyTxConfirm,
-    ApplyTxSuccess,
     // contract
     ContractNew,
     ContractNewSuccess,
@@ -68,11 +53,6 @@ impl Default for StateContainer {
             mode: Mode::Home,
             open_state: Default::default(),
             home_state: Default::default(),
-            create_tx_state: Default::default(),
-            create_tx_success_state: Default::default(),
-            apply_tx_state: Default::default(),
-            apply_tx_confirm_state: Default::default(),
-            apply_tx_success_state: Default::default(),
             has_wallet_open_check_failed_one_time: false,
             // contract
             contract_new_state: Default::default(),
@@ -113,21 +93,10 @@ pub fn data_container<'a>(state: &'a StateContainer, config: &'a Config) -> Cont
     let content = match state.mode {
         Mode::Open => open::data_container(&state.open_state, config),
         Mode::Home => home::data_container(config, &state.home_state),
-        Mode::CreateTx => create_tx::data_container(config, &state.create_tx_state),
-        Mode::CreateTxSuccess => {
-            create_tx_success::data_container(config, &state.create_tx_success_state)
-        }
-        Mode::ApplyTx => apply_tx::data_container(config, &state.apply_tx_state),
-        Mode::ApplyTxConfirm => {
-            apply_tx_confirm::data_container(config, &state.apply_tx_confirm_state)
-        }
-        Mode::ApplyTxSuccess => {
-            apply_tx_success::data_container(config, &state.apply_tx_success_state)
-        }
         // contracts
         Mode::ContractNew => contract_new::data_container(config, &state.contract_new_state),
         Mode::ContractNewSuccess => {
-            create_tx_success::data_container(config, &state.create_tx_success_state)
+            contract_new_success::data_container(config, &state.contract_new_success_state)
         }
         Mode::ContractSign => contract_sign::data_container(config, &state.contract_sign_state),
         Mode::ContractSignConfirm => {

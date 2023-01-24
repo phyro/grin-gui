@@ -230,7 +230,7 @@ pub fn handle_message<'a>(
             grin_gui
                 .wallet_state
                 .operation_state
-                .create_tx_success_state
+                .contract_new_success_state
                 .encrypted_slate = slate.to_string();
             grin_gui.wallet_state.operation_state.mode =
                 crate::gui::element::wallet::operation::Mode::ContractNewSuccess;

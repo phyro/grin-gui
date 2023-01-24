@@ -48,8 +48,6 @@ impl Default for StateContainer {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Action {
-    CreateTx,
-    ApplyTx,
     ContractNew,
     ContractSign,
 }
@@ -75,14 +73,6 @@ pub fn handle_message<'a>(
                 action
             );
             match action {
-                Action::CreateTx => {
-                    grin_gui.wallet_state.operation_state.mode =
-                        crate::gui::element::wallet::operation::Mode::CreateTx
-                }
-                Action::ApplyTx => {
-                    grin_gui.wallet_state.operation_state.mode =
-                        crate::gui::element::wallet::operation::Mode::ApplyTx
-                }
                 Action::ContractNew => {
                     grin_gui.wallet_state.operation_state.mode =
                         crate::gui::element::wallet::operation::Mode::ContractNew
