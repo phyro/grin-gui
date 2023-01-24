@@ -222,7 +222,11 @@ pub fn data_container<'a>(config: &'a Config, state: &'a StateContainer) -> Cont
         Some(s) => s.to_string(),
     };
 
-    let amount = amount_to_hr_string(slate.amount, false);
+    let mut amount = amount_to_hr_string(slate.amount, false);
+    match slate.state {
+        SlateState::Standard2 => amount = format!("-{}", amount),
+        _ => (),
+    }
 
     let mut state_text = slate.state.to_string();
 
