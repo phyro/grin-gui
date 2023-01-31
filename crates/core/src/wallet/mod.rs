@@ -455,6 +455,10 @@ where
         };
         if let Some(o) = &w.owner_api {
             // let slate = { o.init_send_tx(None, init_args)? };
+            println!(
+                "Calling contract::new with net_change: {}",
+                new_args.setup_args.net_change.unwrap()
+            );
             let slate = { o.contract_new(None, &new_args)? };
             // No need to lock outputs as they're already locked atomically
             // o.tx_lock_outputs(None, &slate)?;
@@ -475,6 +479,10 @@ where
         let w = wallet_interface.write().unwrap();
         if let Some(o) = &w.owner_api {
             // let slate = { o.init_send_tx(None, init_args)? };
+            println!(
+                "Calling contract::sign with net_change: {}",
+                setup_args.net_change.unwrap()
+            );
             let slate = { o.contract_sign(None, &slate, &setup_args)? };
             // No need to lock outputs as they're already locked atomically
             // o.tx_lock_outputs(None, &slate)?;

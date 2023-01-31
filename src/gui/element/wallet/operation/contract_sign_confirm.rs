@@ -102,14 +102,8 @@ pub fn handle_message<'a>(
             let out_slate = slate.clone();
             let setup_args = ContractSetupArgsAPI {
                 // TODO: we should get the confirmation here
-                net_change: Some(match slate.state {
-                    SlateState::Standard2 => -(slate.amount as i64), // sender net negative
-                    // SlateState::Standard3 => slate.amount as i64, // receiver net positive
-                    SlateState::Invoice2 => slate.amount as i64, // receiver net positive
-                    // SlateState::Invoice3 => slate.amount as i64,  // receiver net positive
-                    // TODO: Handle others here. Should probably error if we're at step1
-                    _ => slate.amount as i64,
-                }),
+                net_change: Some(slate_to_net_change(&slate)),
+                num_participants: slate.num_participants,
                 // num_participants: num_participants,
                 // add_outputs: true,
                 ..Default::default()
@@ -119,6 +113,7 @@ pub fn handle_message<'a>(
                 slate.state,
                 setup_args.net_change.unwrap()
             );
+            println!("Will encrypt slate for: {}", sp_sending_address);
             let fut = move || {
                 WalletInterface::sign_contract(w, out_slate, setup_args, sp_sending_address)
             };
@@ -223,9 +218,8 @@ pub fn data_container<'a>(config: &'a Config, state: &'a StateContainer) -> Cont
     };
 
     let mut amount = amount_to_hr_string(slate.amount, false);
-    match slate.state {
-        SlateState::Standard2 => amount = format!("-{}", amount),
-        _ => (),
+    if slate_to_net_change(&slate) < 0 {
+        amount = format!("-{}", amount);
     }
 
     let mut state_text = slate.state.to_string();
@@ -242,8 +236,10 @@ pub fn data_container<'a>(config: &'a Config, state: &'a StateContainer) -> Cont
 
     state_text = format!("{} - {}", state_text, state_text_append);
 
-    let hide_continue =
-        slate.state != SlateState::Standard1 && slate.state != SlateState::Standard2;
+    let hide_continue = slate.state != SlateState::Standard1
+        && slate.state != SlateState::Standard2
+        && slate.state != SlateState::Invoice1
+        && slate.state != SlateState::Invoice2;
 
     // Title row
     let title = Text::new(localized_string("apply-tx-confirm"))
@@ -336,6 +332,7 @@ pub fn data_container<'a>(config: &'a Config, state: &'a StateContainer) -> Cont
 
     let mut submit_button = Button::new(submit_button_label_container);
 
+    // TODO: The else branch went into a recursive loop causing the stack to overflow
     if hide_continue {
         submit_button = submit_button.style(grin_gui_core::theme::ButtonStyle::NormalText);
     } else {
@@ -427,4 +424,18 @@ pub fn data_container<'a>(config: &'a Config, state: &'a StateContainer) -> Cont
         DEFAULT_PADDING, // bottom
         DEFAULT_PADDING, // left
     ]))
+}
+
+fn slate_to_net_change(slate: &Slate) -> i64 {
+    match slate.state {
+        // When you receive a slate at step 3, you have state set to number 2
+        SlateState::Standard1 => slate.amount as i64, // SRS step 2
+        SlateState::Standard2 => -(slate.amount as i64), // SRS step 3
+        // SlateState::Standard3 => slate.amount as i64, // receiver net positive
+        SlateState::Invoice1 => -(slate.amount as i64), // RSR step 2
+        SlateState::Invoice2 => slate.amount as i64,    // RSR step 3
+        // SlateState::Invoice3 => slate.amount as i64,  // receiver net positive
+        // TODO: Handle others here. Return an error for cases that should not happen
+        _ => slate.amount as i64,
+    }
 }
